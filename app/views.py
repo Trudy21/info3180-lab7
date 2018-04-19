@@ -5,8 +5,11 @@ Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
 
+import os
+from werkzeug.utils import secure_filename
 from app import app
-from flask import render_template, request
+from flask import render_template, request, jsonify
+from forms import UploadForm
 
 ###
 # Routing for your application.
@@ -21,6 +24,20 @@ def index():
 
 # Here we define a function to collect form errors from Flask-WTF
 # which we can later use
+@app.route('/upload', methods=['POST', 'GET'])
+def upload():
+    forms=UploadForm()
+    if request.method == 'POST':
+        # Get file data and save to your uploads folder
+        if forms.validate_on_submit():
+            photo = forms.photo.data
+            description=forms.photo.data
+        filename = secure_filename(photo.filename)
+        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+        return jsonify({ "message": "File Upload Successful", "filename": "you-uploaded-file.jpg" ,"description": "Some description for your image"})
+    error = form_errors(forms)
+    return jsonify({"errors": error})
 def form_errors(form):
     error_messages = []
     """Collects form errors"""
