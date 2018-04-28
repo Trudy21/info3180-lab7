@@ -24,7 +24,7 @@ def index():
 
 # Here we define a function to collect form errors from Flask-WTF
 # which we can later use
-@app.route('/upload', methods=['POST', 'GET'])
+@app.route('api/upload', methods=['POST', 'GET'])
 def upload():
     forms=UploadForm()
     if request.method == 'POST':
