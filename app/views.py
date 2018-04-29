@@ -21,23 +21,26 @@ def index():
     """Render website's initial page and let VueJS take over."""
     return render_template('index.html')
 
+@app.route('/api/upload', methods=['GET','POST'])
+def upload():
+    forms = UploadForm()
+    if request.method == 'POST':
+        if forms.validate_on_submit():
+            description = forms.description.data
+            photo = forms.photo.data
+            
+            filename = secure_filename(photo.filename)
+            photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+            json = jsonify({ "message": "File Upload Successful", "filename": filename, "description": description })
+            
+            return json
+            
+    error = form_errors(forms)
+    return jsonify({"errors": error})
 
 # Here we define a function to collect form errors from Flask-WTF
 # which we can later use
-@app.route('api/upload', methods=['POST', 'GET'])
-def upload():
-    forms=UploadForm()
-    if request.method == 'POST':
-        # Get file data and save to your uploads folder
-        if forms.validate_on_submit():
-            photo = forms.photo.data
-            description=forms.photo.data
-        filename = secure_filename(photo.filename)
-        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            
-        return jsonify({ "message": "File Upload Successful", "filename": "you-uploaded-file.jpg" ,"description": "Some description for your image"})
-    error = form_errors(forms)
-    return jsonify({"errors": error})
 def form_errors(form):
     error_messages = []
     """Collects form errors"""

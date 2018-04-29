@@ -1,5 +1,6 @@
 /* Add your Application JavaScript */
-Vue.component('app-header', {
+Vue.component('app-header',
+{
     template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
       <a class="navbar-brand" href="#">Lab 7</a>
@@ -12,13 +13,17 @@ Vue.component('app-header', {
           <li class="nav-item active">
             <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
           </li>
+           <li class="nav-item active">
+            <router-link class="nav-link" to="/api/upload"> Upload <span class="sr-only">(current)</span></router-link>
+          </li>
         </ul>
       </div>
     </nav>
     `
 });
 
-Vue.component('app-footer', {
+Vue.component('app-footer',
+{
     template: `
     <footer>
         <div class="container">
@@ -28,7 +33,8 @@ Vue.component('app-footer', {
     `
 });
 
-const Home = Vue.component('home', {
+const Home = Vue.component('home',
+{
    template: `
     <div class="jumbotron">
         <h1>Lab 7</h1>
@@ -40,10 +46,69 @@ const Home = Vue.component('home', {
     }
 });
 
+const Upload = Vue.component('upload-form',
+{
+   template:
+   `
+   
+   <div class="form">
+        <form methods="POST" enctype="multipart/form-data" @submit.prevent="uploadPhoto" id="uploadForm">
+            <p> Description </p>
+            <textarea class="form-control" name="description" placeholder="Describe the Photo"> </textarea>
+            
+            <p> Photo Upload </p>
+            <input type="file" class="form-control" name="photo" />
+            
+            <button type="submit" class="btn btn-primary"> Submit </button>
+            
+        </form>
+   </div>
+   `,
+   
+   methods:
+   {
+       uploadPhoto: function()
+       {
+           let uploadForm = document.getElementById('uploadForm'); 
+           let form_data = new FormData(uploadForm);
+           
+           fetch("/api/upload",
+           {
+               method: 'POST',
+               body: form_data,
+               headers:
+               {
+                   'X-CSRFToken': token
+               },
+               credentials: 'same-origin'
+           })
+           .then
+           
+           (function (response)
+           {
+               return response.json();     
+           }).then
+           
+           (function (jsonResponse)
+           {
+               console.log(jsonResponse);
+           }).catch
+           
+           (function (error)
+           {
+               console.log(error);
+           }); 
+      }
+   }
+});
+
 // Define Routes
 const router = new VueRouter({
     routes: [
-        { path: "/", component: Home }
+        { 
+            path: "/", component: Home, 
+            path: "/api/upload", component: Upload
+        }
     ]
 });
 
